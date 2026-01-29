@@ -1,0 +1,17 @@
+# Vercel Serverless Requirements
+# These are the lightweight dependencies for serverless functions
+
+# HTTP clients
+requests>=2.31.0
+cloudscraper>=1.2.71
+httpx>=0.25.0
+
+# HTML parsing
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+
+# Utilities
+python-dateutil>=2.8.0
+
+# Optional: Redis for job persistence (Vercel KV)
+redis>=5.0.0

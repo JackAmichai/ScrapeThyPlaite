@@ -312,7 +312,19 @@ ScrapeThyPlaite/
 │   │   ├── fingerprint.py
 │   │   ├── headers.py
 │   │   ├── evasion.py
-│   │   └── antibot_detection.py    # NEW: Protection detection system
+│   │   └── antibot_detection.py    # Protection detection system
+│   ├── ai/                          # NEW: AI-powered extraction
+│   │   └── __init__.py              # OpenAI, Anthropic integration
+│   ├── distributed/                 # NEW: Distributed scraping
+│   │   └── __init__.py              # Redis job queue, workers
+│   ├── sessions/                    # NEW: Session management
+│   │   └── __init__.py              # Persistent browser sessions
+│   ├── monitoring/                  # NEW: Real-time monitoring
+│   │   └── __init__.py              # WebSocket dashboard
+│   ├── fingerprint/                 # NEW: Fingerprint rotation
+│   │   └── __init__.py              # Browser fingerprint management
+│   ├── api/                         # NEW: REST API server
+│   │   └── server.py                # FastAPI application
 │   ├── extractors/
 │   │   ├── __init__.py
 │   │   ├── css_extractor.py
@@ -323,26 +335,72 @@ ScrapeThyPlaite/
 │       ├── retry.py
 │       ├── rate_limiter.py
 │       └── export.py
+├── api/                             # NEW: Vercel serverless functions
+│   ├── index.py
+│   ├── scrape.py
+│   ├── batch.py
+│   ├── status.py
+│   └── health.py
+├── docs/
+│   └── VERCEL_DEPLOYMENT.md         # NEW: Vercel deployment guide
 ├── examples/
 │   ├── basic_scraping.py
 │   ├── cloudflare_bypass.py
 │   ├── captcha_solving.py
 │   ├── proxy_rotation.py
-│   └── tough_sites.py              # NEW: Madlan, Yad2, protected sites
+│   └── tough_sites.py              # Madlan, Yad2, protected sites
 ├── tests/
+├── vercel.json                      # NEW: Vercel configuration
 ├── requirements.txt
 ├── setup.py
 └── README.md
 ```
 
-## 🤝 Contributing
+## 🌐 Vercel Deployment
 
-Contributions are welcome! Please read our contributing guidelines.
+Deploy as a serverless API in one click:
 
-## 📄 License
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/JackAmichai/ScrapeThyPlaite)
 
-MIT License - see LICENSE file for details.
+```bash
+# Or via CLI
+npm i -g vercel
+vercel
+```
 
-## ⚠️ Disclaimer
+See [docs/VERCEL_DEPLOYMENT.md](docs/VERCEL_DEPLOYMENT.md) for detailed setup instructions.
 
-This tool is for educational and legitimate business purposes only. Users are responsible for ensuring their use complies with applicable laws and website terms of service.
+## 🆕 v2.0 Competitive Edge Features
+
+### 🧠 AI-Powered Extraction
+```python
+from scrape_thy_plaite import SmartExtractor
+
+extractor = SmartExtractor()
+data = await extractor.extract(html, schema={"products": "list", "prices": "float"})
+```
+
+### 📊 Distributed Scraping
+```python
+from scrape_thy_plaite import DistributedScraper
+
+scraper = DistributedScraper(redis_url="redis://localhost:6379")
+await scraper.add_urls(urls)  # Add millions of URLs
+await scraper.start_workers(10)  # Scale horizontally
+```
+
+### 🔄 Fingerprint Rotation
+```python
+from scrape_thy_plaite import FingerprintRotator
+
+rotator = FingerprintRotator(rotate_every=50)
+fingerprint = rotator.get_fingerprint()  # Auto-rotates
+```
+
+### 📈 Real-Time Monitoring
+```python
+from scrape_thy_plaite import MonitoringServer, MetricsCollector
+
+collector = MetricsCollector()
+server = MonitoringServer(collector, port=8765)
+await server.start()  # WebSocket dashboard

@@ -1,0 +1,66 @@
+{
+  "version": 2,
+  "name": "scrape-thy-plaite",
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/scrape.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/batch.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/status.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/health.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/api/scrape",
+      "dest": "/api/scrape.py"
+    },
+    {
+      "src": "/api/batch",
+      "dest": "/api/batch.py"
+    },
+    {
+      "src": "/api/status/(.*)",
+      "dest": "/api/status.py?job_id=$1"
+    },
+    {
+      "src": "/api/health",
+      "dest": "/api/health.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.py"
+    }
+  ],
+  "env": {
+    "SCRAPER_API_KEY": "@scraper-api-key",
+    "REDIS_URL": "@redis-url",
+    "OPENAI_API_KEY": "@openai-api-key",
+    "ANTHROPIC_API_KEY": "@anthropic-api-key",
+    "TWOCAPTCHA_API_KEY": "@twocaptcha-api-key"
+  },
+  "regions": ["iad1"],
+  "functions": {
+    "api/**/*.py": {
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  }
+}
