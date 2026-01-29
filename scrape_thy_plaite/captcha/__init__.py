@@ -84,6 +84,17 @@ class BaseCaptchaSolver(ABC):
         pass
     
     @abstractmethod
+    async def solve_funcaptcha(
+        self,
+        public_key: str,
+        page_url: str,
+        service_url: str = None,
+        **kwargs
+    ) -> str:
+        """Solve FunCaptcha (Arkose Labs)."""
+        pass
+    
+    @abstractmethod
     async def get_balance(self) -> float:
         """Get account balance."""
         pass
@@ -265,6 +276,38 @@ class TwoCaptchaSolver(BaseCaptchaSolver):
         logger.info("Turnstile solved successfully")
         return result
     
+    async def solve_funcaptcha(
+        self,
+        public_key: str,
+        page_url: str,
+        service_url: str = None,
+        **kwargs
+    ) -> str:
+        """
+        Solve FunCaptcha (Arkose Labs).
+        
+        Args:
+            public_key: The public key (pk parameter)
+            page_url: URL of the page
+            service_url: Optional service URL (surl parameter)
+        """
+        logger.info(f"Solving FunCaptcha for {page_url}")
+        
+        params = {
+            "method": "funcaptcha",
+            "publickey": public_key,
+            "pageurl": page_url,
+        }
+        
+        if service_url:
+            params["surl"] = service_url
+        
+        task_id = await self._submit_task(params)
+        result = await self._get_result(task_id)
+        
+        logger.info("FunCaptcha solved successfully")
+        return result
+    
     async def get_balance(self) -> float:
         """Get account balance."""
         await self._init_client()
@@ -435,6 +478,35 @@ class AntiCaptchaSolver(BaseCaptchaSolver):
         task_id = await self._create_task(task)
         return await self._get_task_result(task_id)
     
+    async def solve_funcaptcha(
+        self,
+        public_key: str,
+        page_url: str,
+        service_url: str = None,
+        **kwargs
+    ) -> str:
+        """
+        Solve FunCaptcha (Arkose Labs).
+        
+        Args:
+            public_key: The public key (pk parameter)
+            page_url: URL of the page
+            service_url: Optional service URL (surl parameter)
+        """
+        logger.info(f"Solving FunCaptcha for {page_url}")
+        
+        task = {
+            "type": "FunCaptchaTaskProxyless",
+            "websiteURL": page_url,
+            "websitePublicKey": public_key,
+        }
+        
+        if service_url:
+            task["funcaptchaApiJSSubdomain"] = service_url
+        
+        task_id = await self._create_task(task)
+        return await self._get_task_result(task_id)
+    
     async def get_balance(self) -> float:
         """Get account balance."""
         await self._init_client()
@@ -529,6 +601,10 @@ class CaptchaSolver:
                     )
                 elif captcha_type == CaptchaType.TURNSTILE:
                     return await self._solver.solve_turnstile(
+                        site_key, page_url, **kwargs
+                    )
+                elif captcha_type == CaptchaType.FUNCAPTCHA:
+                    return await self._solver.solve_funcaptcha(
                         site_key, page_url, **kwargs
                     )
                 else:

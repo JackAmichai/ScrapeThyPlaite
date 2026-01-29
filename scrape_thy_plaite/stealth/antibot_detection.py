@@ -21,6 +21,7 @@ class ProtectionType(Enum):
     AKAMAI = "akamai"
     PERIMETERX = "perimeterx"
     KASADA = "kasada"
+    ARKOSE_LABS = "arkose_labs"  # FunCaptcha
     SHAPE_SECURITY = "shape_security"
     RECAPTCHA_V2 = "recaptcha_v2"
     RECAPTCHA_V3 = "recaptcha_v3"
@@ -112,6 +113,18 @@ class ProtectionDetector:
         r'x-kpsdk-im',
         r'kasada',
         r'/149e9513-01fa-4fb0-aad4-566afd725d1b/',
+    ]
+    
+    # Arkose Labs (FunCaptcha) patterns
+    ARKOSE_PATTERNS = [
+        r'arkoselabs',
+        r'funcaptcha',
+        r'fc-token',
+        r'arkose\.com',
+        r'client-api\.arkoselabs\.com',
+        r'arkoselabs\.io',
+        r'FunCaptcha',
+        r'enforcement\.arkoselabs\.com',
     ]
     
     # reCAPTCHA patterns
@@ -253,6 +266,25 @@ class ProtectionDetector:
                 bypass_recommended="drission_page"
             ))
         
+        # Check Arkose Labs (FunCaptcha)
+        arkose_score = cls._check_patterns(
+            cls.ARKOSE_PATTERNS,
+            html,
+            headers,
+            cookies
+        )
+        if arkose_score > 0:
+            # Extract public key if possible
+            public_key = cls._extract_arkose_key(html)
+            detections.append(ProtectionDetection(
+                protection_type=ProtectionType.ARKOSE_LABS,
+                confidence=min(arkose_score * 0.3, 1.0),
+                details={
+                    "public_key": public_key,
+                },
+                bypass_recommended="captcha_solver"
+            ))
+        
         # Check reCAPTCHA
         rc_score = cls._check_patterns(
             cls.RECAPTCHA_PATTERNS,
@@ -346,6 +378,26 @@ class ProtectionDetector:
                 return match.group(1)
         
         return None
+    
+    @classmethod
+    def _extract_arkose_key(cls, html: str) -> Optional[str]:
+        """Extract Arkose Labs (FunCaptcha) public key from HTML."""
+        # Try data-public-key attribute
+        match = re.search(r'data-public-key=["\']([^"\']+)["\']', html)
+        if match:
+            return match.group(1)
+        
+        # Try publicKey in JavaScript
+        match = re.search(r'publicKey["\']?\s*[:=]\s*["\']([A-F0-9-]+)["\']', html, re.IGNORECASE)
+        if match:
+            return match.group(1)
+        
+        # Try pk parameter in URL
+        match = re.search(r'[?&]pk=([A-F0-9-]+)', html, re.IGNORECASE)
+        if match:
+            return match.group(1)
+        
+        return None
 
 
 class BypassStrategySelector:
@@ -362,6 +414,7 @@ class BypassStrategySelector:
         ProtectionType.AKAMAI: ["tls_fingerprint", "drission_page", "playwright_stealth"],
         ProtectionType.PERIMETERX: ["drission_page", "playwright_stealth", "tls_fingerprint"],
         ProtectionType.KASADA: ["drission_page", "playwright_stealth"],
+        ProtectionType.ARKOSE_LABS: ["captcha_solver", "drission_page"],
         ProtectionType.SHAPE_SECURITY: ["drission_page", "playwright_stealth"],
         ProtectionType.RECAPTCHA_V2: ["captcha_solver", "drission_page"],
         ProtectionType.RECAPTCHA_V3: ["captcha_solver", "playwright_stealth"],
