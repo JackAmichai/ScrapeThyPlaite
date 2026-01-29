@@ -53,6 +53,10 @@ user-agents>=2.2.0
 requests-html>=0.10.0
 pyppeteer>=1.0.2
 
+# Advanced Browser Automation (Anti-Detection)
+DrissionPage>=4.0.0
+nodriver>=0.35
+
 # Storage & Export
 sqlalchemy>=2.0.0
 motor>=3.3.0  # MongoDB async

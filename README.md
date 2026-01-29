@@ -5,22 +5,38 @@
 
 ## 🚀 The Most Advanced Open-Source Web Scraping Framework
 
-ScrapeThyPlaite is an enterprise-grade web scraping framework designed for AI companies and data scientists who need reliable, ethical, and powerful data extraction capabilities.
+ScrapeThyPlaite is an enterprise-grade web scraping framework designed for AI companies and data scientists who need reliable, ethical, and powerful data extraction capabilities. **Capable of bypassing the toughest protections including DataDome, Cloudflare, Akamai, PerimeterX, and more.**
 
 ## ✨ Features
 
 ### 🛡️ Anti-Detection & Bypass Capabilities
+- **Multi-Layer Bypass System** - Automatic strategy escalation when blocked
+- **TLS Fingerprint Spoofing** - curl_cffi with JA3/JA4 fingerprint impersonation
+- **DrissionPage Integration** - Undetectable browser automation with no webdriver flags
+- **Playwright Stealth** - Maximum stealth with comprehensive anti-detection scripts
 - **Undetected Chrome Driver** - Bypasses bot detection systems
-- **Cloudflare Bypass** - Navigate through Cloudflare protection
+- **Cloudflare Bypass** - Navigate through Cloudflare/Turnstile protection
+- **DataDome Bypass** - Handle aggressive fingerprinting
+- **Akamai/PerimeterX Bypass** - Commercial WAF bypass capabilities
 - **CAPTCHA Solving** - Integration with 2Captcha, Anti-Captcha, and CapMonster
-- **Browser Fingerprint Randomization** - Evade fingerprinting techniques
-- **TLS Fingerprint Spoofing** - Mimic real browser TLS signatures
+- **Browser Fingerprint Randomization** - Evade canvas, WebGL, audio fingerprinting
+- **Protection Auto-Detection** - Automatically detect and respond to protection systems
+
+### 🇮🇱 Israeli Sites Support
+- **Madlan.co.il** - Real estate portal with DataDome protection
+- **Yad2.co.il** - Classifieds with custom protection
+- **Walla/Globes** - News sites with Cloudflare/Akamai
+- Pre-configured strategies for Israeli websites
 
 ### 🔄 Multi-Engine Support
+- **TLS Fingerprint Engine** - curl_cffi for HTTP/2 with browser impersonation
+- **DrissionPage Engine** - Chrome DevTools Protocol without webdriver detection
+- **Playwright Stealth** - Async browser with comprehensive evasion
+- **Ultimate Scraper** - Auto-escalating multi-strategy scraper
 - **Selenium** - Full browser automation
 - **Playwright** - Modern async browser automation
-- **Requests/HTTPX** - Fast HTTP client for simple scraping
-- **Scrapy Integration** - Distributed crawling support
+- **CloudScraper** - Cloudflare bypass
+- **HTTPX** - Fast async HTTP client
 
 ### 🌐 Proxy & Network
 - **Rotating Proxy Support** - Automatic proxy rotation
@@ -107,6 +123,82 @@ with CloudflareScraper() as scraper:
     response = scraper.get("https://cloudflare-protected-site.com")
 ```
 
+### 🚀 NEW: Ultimate Scraper (Toughest Sites)
+
+```python
+from scrape_thy_plaite.engines import UltimateScraper, SiteSpecificScraper, BypassStrategy
+
+# Auto-escalating scraper - tries multiple strategies until success
+scraper = UltimateScraper()
+await scraper.initialize()
+
+# Automatically escalates: TLS -> CloudScraper -> Undetected Chrome -> Playwright Stealth -> DrissionPage
+result = await scraper.scrape(
+    "https://tough-protected-site.com",
+    wait_for_selector=".content"
+)
+
+if result["success"]:
+    print(f"Strategy used: {result['strategy_used']}")
+    print(f"HTML length: {len(result['html'])}")
+```
+
+### 🇮🇱 Israeli Sites (Madlan, Yad2)
+
+```python
+from scrape_thy_plaite.engines import SiteSpecificScraper
+
+# Pre-configured for Israeli site protections (DataDome, etc.)
+scraper = await SiteSpecificScraper.for_israeli_sites()
+await scraper.initialize()
+
+# Scrape Madlan (DataDome protected)
+result = await scraper.scrape(
+    "https://www.madlan.co.il/for-sale/tel-aviv-yafo",
+    wait_for_selector="div[data-testid='listing-card']"
+)
+
+# Or use specialized MadlanScraper from examples/tough_sites.py
+from examples.tough_sites import MadlanScraper
+
+async with MadlanScraper() as scraper:
+    apartments = await scraper.search_apartments(
+        city="tel-aviv-yafo",
+        min_price=1000000,
+        min_rooms=3
+    )
+```
+
+### TLS Fingerprint Engine
+
+```python
+from scrape_thy_plaite.engines import TLSFingerprintEngine
+
+# Impersonate real browser TLS fingerprints
+tls_engine = TLSFingerprintEngine()
+await tls_engine.initialize()
+
+# Uses curl_cffi to perfectly mimic Chrome/Edge/Safari TLS
+response = await tls_engine.get("https://tls-protected-site.com")
+```
+
+### Protection Auto-Detection
+
+```python
+from scrape_thy_plaite.stealth import detect_and_recommend
+
+# Detect what protection a site uses
+result = detect_and_recommend(
+    html=response_html,
+    headers=response_headers,
+    cookies=response_cookies,
+    status_code=403
+)
+
+print(result["protections"])  # [{"type": "datadome", "confidence": 0.9, ...}]
+print(result["recommended_strategies"])  # ["drission_page", "playwright_stealth"]
+```
+
 ### CAPTCHA Solving
 
 ```python
@@ -175,7 +267,11 @@ ScrapeThyPlaite/
 │   │   ├── playwright_engine.py
 │   │   ├── undetected_chrome.py
 │   │   ├── cloudscraper_engine.py
-│   │   └── httpx_engine.py
+│   │   ├── httpx_engine.py
+│   │   ├── tls_fingerprint.py      # NEW: TLS/JA3 fingerprint spoofing
+│   │   ├── drission_engine.py      # NEW: Undetectable browser automation
+│   │   ├── playwright_stealth.py   # NEW: Maximum stealth Playwright
+│   │   └── ultimate_scraper.py     # NEW: Multi-strategy auto-escalation
 │   ├── captcha/
 │   │   ├── __init__.py
 │   │   ├── base_solver.py
@@ -190,7 +286,8 @@ ScrapeThyPlaite/
 │   │   ├── __init__.py
 │   │   ├── fingerprint.py
 │   │   ├── headers.py
-│   │   └── evasion.py
+│   │   ├── evasion.py
+│   │   └── antibot_detection.py    # NEW: Protection detection system
 │   ├── extractors/
 │   │   ├── __init__.py
 │   │   ├── css_extractor.py
@@ -205,7 +302,8 @@ ScrapeThyPlaite/
 │   ├── basic_scraping.py
 │   ├── cloudflare_bypass.py
 │   ├── captcha_solving.py
-│   └── proxy_rotation.py
+│   ├── proxy_rotation.py
+│   └── tough_sites.py              # NEW: Madlan, Yad2, protected sites
 ├── tests/
 ├── requirements.txt
 ├── setup.py

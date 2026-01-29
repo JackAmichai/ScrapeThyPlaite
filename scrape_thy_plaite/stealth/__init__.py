@@ -8,6 +8,14 @@ from scrape_thy_plaite.stealth.headers import (
     HeaderRotator,
 )
 from scrape_thy_plaite.stealth.evasion import apply_stealth_scripts
+from scrape_thy_plaite.stealth.antibot_detection import (
+    ProtectionType,
+    ProtectionDetection,
+    ProtectionDetector,
+    BypassStrategySelector,
+    IsraeliSiteDetector,
+    detect_and_recommend,
+)
 
 __all__ = [
     "FingerprintGenerator",
@@ -17,4 +25,11 @@ __all__ = [
     "parse_user_agent",
     "generate_headers",
     "HeaderRotator",
+    # Anti-bot detection
+    "ProtectionType",
+    "ProtectionDetection",
+    "ProtectionDetector",
+    "BypassStrategySelector",
+    "IsraeliSiteDetector",
+    "detect_and_recommend",
 ]
